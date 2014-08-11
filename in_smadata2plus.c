@@ -1102,8 +1102,8 @@ void in_smadata2plus_get_historic_values(struct bluetooth_inverter * inv,time_t 
 	in_smadata2plus_level1_packet_send(inv, &sent_pl1);
 
 	/* temp value store */
-	int timestamp=0 ,prev_timestamp = 0,diff=0;
-	long value = 0,prev_value = 0;
+	int timestamp = 0;
+	long value = 0;
 
 	/* Wait for all answers */
 	while(1){

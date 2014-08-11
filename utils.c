@@ -32,14 +32,12 @@ void buffer_hex_dump(char * output, unsigned char * buffer, int len) {
 	output[0] = '\0';
 
 	for (int i = 0; i < len; ++i) {
-
 		sprintf(hex, "%02x:", buffer[i]);
-		strncat(output, hex, sizeof(output));
+		strncat(output, hex, 14);
 	}
 
 	//remove last colon
 	output[strlen(output) - 1] = '\0';
-
 }
 
 void buffer_reverse(unsigned char * buffer, int len) {

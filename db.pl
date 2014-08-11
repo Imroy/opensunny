@@ -11,7 +11,7 @@ my $db = $client->get_database('inverter');
 my $values_col = $db->get_collection('values');
 my $inverters_col = $db->get_collection('inverters');
 
-$values_col->ensure_index({ timestamp => 1,
+$values_col->ensure_index({ _t => 1,
 			    inverter => 1 },
 			  { unique => 1 });
 $inverters_col->ensure_index({ serial => 1 },
@@ -71,7 +71,7 @@ foreach my $line (@lines) {
 
   if (defined $values->{timestamp}) {
     my $ts = delete $values->{timestamp};
-    $values_col->update({ timestamp => $ts, inverter => $inverter->{serial} },
+    $values_col->update({ _t => $ts, inverter => $inverter->{serial} },
 			{ '$set' => $values },
 			{ upsert => 1, safe => 1 }
 		       );

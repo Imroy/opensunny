@@ -1,0 +1,11 @@
+Immediately:
+ - why am I getting "voltage_ac_l1=167772.146V" and "current_ac_l1=16777.216A" on all three phases?
+ - why is model '(null)'?
+
+Then:
+ - Add functionality to log collected information to a MongoDB database
+
+Later:
+ - Convert to C++?
+ - Clean up
+ - Use external libs like Boost to make code more concise

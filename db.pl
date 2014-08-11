@@ -12,8 +12,10 @@ my $values_col = $db->get_collection('values');
 my $inverters_col = $db->get_collection('inverters');
 
 $values_col->ensure_index({ timestamp => 1,
-			    inverter => 1 });
-$inverters_col->ensure_index({ serial => 1 });
+			    inverter => 1 },
+			  { unique => 1 });
+$inverters_col->ensure_index({ serial => 1 },
+			     { unique => 1 });
 
 my($in, $out, $err);
 $err = gensym;

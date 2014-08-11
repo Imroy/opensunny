@@ -68,7 +68,7 @@ foreach my $line (@lines) {
   }
 
   if (defined $values->{timestamp}) {
-    my $ts = $values->{timestamp};
+    my $ts = delete $values->{timestamp};
     $values_col->update({ timestamp => $ts, inverter => $inverter->{serial} },
 			{ '$set' => $values },
 			{ upsert => 1, safe => 1 }

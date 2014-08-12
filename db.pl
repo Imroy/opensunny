@@ -63,14 +63,15 @@ foreach my $line (@lines) {
 	$value =~ s{^(.*?\d+)\D+$} {$1};
       }
       if ($key eq 'timestamp') {
+	$key = '_t';
 	$value = DateTime->from_epoch(epoch => $value);
       }
       $values->{$key} = $value;
     }
   }
 
-  if (defined $values->{timestamp}) {
-    my $ts = delete $values->{timestamp};
+  if (defined $values->{_t}) {
+    my $ts = delete $values->{_t};
     $values_col->update({ _t => $ts, inverter => $inverter->{serial} },
 			{ '$set' => $values },
 			{ upsert => 1, safe => 1 }

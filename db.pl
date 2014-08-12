@@ -11,7 +11,7 @@ my $db = $client->get_database('inverter');
 my $values_col = $db->get_collection('values');
 my $inverters_col = $db->get_collection('inverters');
 
-$values_col->ensure_index({ _t => 1,
+$values_col->ensure_index({ day => 1,
 			    inverter => 1 },
 			  { unique => 1 });
 $inverters_col->ensure_index({ serial => 1 },
@@ -71,11 +71,33 @@ foreach my $line (@lines) {
   }
 
   if (defined $values->{_t}) {
-    my $ts = delete $values->{_t};
-    $values_col->update({ _t => $ts, inverter => $inverter->{serial} },
-			{ '$set' => $values },
-			{ upsert => 1, safe => 1 }
-		       );
+    my $ts = $values->{_t};
+    my $day = $ts->clone->set_hour(0)->set_minute(0)->set_second(0)->set_nanosecond(0);
+    if ($values_col->count({ day => $day, inverter => $inverter->{serial}, 'readings._t' => $ts }) > 0) {
+      my $set_values = {};
+      while (my ($key, $value) = each %{$values}) {
+	next if ($key eq '_t');
+	$set_values->{'readings.$.' . $key} = $value;
+      }
+      $values_col->update({ day => $day, inverter => $inverter->{serial}, 'readings._t' => $ts },
+			  { '$set' => $set_values,
+			  },
+			  { safe => 1 }
+			 );
+      exit;
+    } elsif ($values_col->count({ day => $day, inverter => $inverter->{serial} }) > 0) {
+      $values_col->update({ day => $day, inverter => $inverter->{serial} },
+			  { '$push' => { readings => $values },
+			  },
+			  { safe => 1 }
+			 );
+    } else {
+      $values_col->insert({ day => $day,
+			    inverter => $inverter->{serial},
+			    readings => [ $values ],
+			  },
+			  { safe => 1 });
+    }
   } elsif (defined $inverter->{serial}) {
     my $serial = $inverter->{serial};
     $inverters_col->update({ serial => $serial },

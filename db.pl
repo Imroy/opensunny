@@ -73,6 +73,7 @@ foreach my $line (@lines) {
   if (defined $values->{_t}) {
     my $ts = $values->{_t};
     my $day = $ts->clone->set_hour(0)->set_minute(0)->set_second(0)->set_nanosecond(0);
+    my $value_names = [ grep { $_ ne '_t' } keys %{$values} ];
     if ($values_col->count({ day => $day, inverter => $inverter->{serial}, 'readings._t' => $ts }) > 0) {
       my $set_values = {};
       while (my ($key, $value) = each %{$values}) {
@@ -81,6 +82,7 @@ foreach my $line (@lines) {
       }
       $values_col->update({ day => $day, inverter => $inverter->{serial}, 'readings._t' => $ts },
 			  { '$set' => $set_values,
+			    '$addToSet' => { value_names => { '$each' => $value_names } },
 			  },
 			  { safe => 1 }
 			 );
@@ -88,6 +90,7 @@ foreach my $line (@lines) {
     } elsif ($values_col->count({ day => $day, inverter => $inverter->{serial} }) > 0) {
       $values_col->update({ day => $day, inverter => $inverter->{serial} },
 			  { '$push' => { readings => $values },
+			    '$addToSet' => { value_names => { '$each' => $value_names } },
 			  },
 			  { safe => 1 }
 			 );
@@ -95,6 +98,7 @@ foreach my $line (@lines) {
       $values_col->insert({ day => $day,
 			    inverter => $inverter->{serial},
 			    readings => [ $values ],
+			    value_names => $value_names,
 			  },
 			  { safe => 1 });
     }

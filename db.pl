@@ -86,7 +86,6 @@ foreach my $line (@lines) {
 			  },
 			  { safe => 1 }
 			 );
-      exit;
     } elsif ($values_col->count({ day => $day, inverter => $inverter->{serial} }) > 0) {
       $values_col->update({ day => $day, inverter => $inverter->{serial} },
 			  { '$push' => { readings => $values },
